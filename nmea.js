@@ -17,6 +17,35 @@ const m_hex = [
   'F'
 ]
 
+const defaultTalkerIDbySentence = {
+  GGA: 'GP',
+  RMC: 'GP',
+  GLL: 'GP'
+}
+
+var talkerIDbySentence = {}
+
+function getTalkerIDBySentence(sentence) {
+  var talkerID = talkerIDbySentence[sentence]
+  if (typeof talkerID === 'undefined') {
+    talkerID = defaultTalkerIDbySentence[sentence]
+    if (typeof talkerID === 'undefined') {
+      talkerID = 'II'
+    }
+    setTalkerIDforSentence(sentence, talkerID)
+  }
+  return talkerID
+}
+
+function setTalkerIDforSentence(sentence, talkerID) {
+  talkerIDbySentence[sentence] = talkerID
+}
+
+function getSentencePrefix(sentence) {
+  const talkerID = getTalkerIDBySentence(sentence)
+  return '$' + talkerID + sentence
+}
+
 function toSentence (parts) {
   var base = parts.join(',')
   return base + computeChecksum(base)
@@ -148,5 +177,8 @@ module.exports = {
   toNmeaDegreesLatitude: toNmeaDegreesLatitude,
   toNmeaDegreesLongitude: toNmeaDegreesLongitude,
   fixAngle: fixAngle,
-  radsToPositiveDeg
+  radsToPositiveDeg,
+  getSentencePrefix,
+  getTalkerIDBySentence,
+  setTalkerIDforSentence
 }

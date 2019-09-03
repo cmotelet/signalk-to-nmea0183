@@ -77,8 +77,19 @@ function buildSchemaFromSentences (plugin) {
     var sentence = plugin.sentences[key]
     plugin.schema.properties[key] = {
       title: sentence['title'],
-      type: 'boolean',
-      default: false
+      type: 'object',
+      properties: {
+        active: {
+          title: sentence['title'],
+          type: 'boolean',
+          default: false
+        },
+        talkerID: {
+          title: sentence['title'],
+          type: 'string',
+          default: getTalkerIDBySentence(key)
+        }
+      }
     }
   })
 }
