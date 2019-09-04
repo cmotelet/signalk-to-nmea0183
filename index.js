@@ -5,7 +5,8 @@ const {
   toHexString,
   radsToDeg,
   padd,
-  toNmeaDegrees
+  toNmeaDegrees,
+  getTalkerIDBySentence
 } = require('./nmea')
 const path = require('path')
 const fs = require('fs')
@@ -55,9 +56,8 @@ module.exports = function (app) {
           })
       )
     }
-
     Object.keys(plugin.sentences).forEach(name => {
-      if (options[name]) {
+      if (options[name].active) {
         mapToNmea(plugin.sentences[name])
       }
     })
@@ -67,6 +67,21 @@ module.exports = function (app) {
     plugin.unsubscribes.forEach(f => f())
   }
 
+  function updatePluginOptions () {
+//  var configuration  = app.getPluginOptions(plugin.id)
+//  console.log(configuration)
+    app.savePluginOptions({}, err => {
+      if ( err ) {
+        app.error(err.toString())
+        res.status(500)
+        res.send("can't save config")
+      } else {
+          res.send('ok')
+        }
+    })
+  }
+
+updatePluginOptions()
   plugin.sentences = loadSentences(app, plugin)
   buildSchemaFromSentences(plugin)
   return plugin
@@ -80,12 +95,10 @@ function buildSchemaFromSentences (plugin) {
       type: 'object',
       properties: {
         active: {
-          title: sentence['title'],
           type: 'boolean',
           default: false
         },
         talkerID: {
-          title: sentence['title'],
           type: 'string',
           default: getTalkerIDBySentence(key)
         }
