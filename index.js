@@ -67,6 +67,21 @@ module.exports = function (app) {
     plugin.unsubscribes.forEach(f => f())
   }
 
+  function updatePluginOptions () {
+    var configuration  = app.readPluginOptions()
+    console.log(configuration)
+    app.savePluginOptions(configuration, err => {
+      if ( err ) {
+        app.error(err.toString())
+        res.status(500)
+        res.send("can't save config")
+      } else {
+          res.send('ok')
+        }
+    })
+  }
+
+  updatePluginOptions()
   plugin.sentences = loadSentences(app, plugin)
   buildSchemaFromSentences(plugin)
   return plugin
