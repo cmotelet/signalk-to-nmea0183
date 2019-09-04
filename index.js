@@ -32,6 +32,7 @@ module.exports = function (app) {
     const selfContext = 'vessels.' + app.selfId
     const selfMatcher = delta => delta.context && delta.context === selfContext
 
+    updatePluginOptions()
     function mapToNmea (encoder) {
       const selfStreams = encoder.keys.map((key, index) => {
         let stream = app.streambundle.getSelfStream(key)
@@ -68,20 +69,15 @@ module.exports = function (app) {
   }
 
   function updatePluginOptions () {
-//  var configuration  = app.getPluginOptions(plugin.id)
-//  console.log(configuration)
-    app.savePluginOptions({}, err => {
+    var configuration  = app.getPluginOptions(plugin.id)
+    console.log(configuration)
+    app.savePluginOptions(configuration, err => {
       if ( err ) {
         app.error(err.toString())
-        res.status(500)
-        res.send("can't save config")
-      } else {
-          res.send('ok')
-        }
+      }
     })
   }
 
-updatePluginOptions()
   plugin.sentences = loadSentences(app, plugin)
   buildSchemaFromSentences(plugin)
   return plugin
